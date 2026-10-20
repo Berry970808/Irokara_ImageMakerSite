@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      色カラ | 楽曲ビンゴメーカー
+    </title>
+    <style>
+    /* ページ全体の配色・余白・レイアウト・入力部品のデザイン */
+    * {
+      box-sizing:border-box;
+    }
+
+    body {
+      margin:0;
+      background:#0c1020;
+      color:#f5f4fb;
+      font:14px system-ui,sans-serif;
+    }
+
+    header {
+      padding:22px 5%;
+      border-bottom:1px solid #303449;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    h1 {
+      font-size:20px;
+      margin:0;
+    }
+
+    header small {
+      color:#aba9c4;
+    }
+
+    .badge {
+      background:#292342;
+      color:#e0bbff;
+      padding:7px 12px;
+      border-radius:20px;
+    }
+
+    main {
+      max-width:1500px;
+      margin:auto;
+      padding:30px 4%;
+    }
+
+    .intro {
+      margin-bottom:24px;
+    }
+
+    .intro h2 {
+      font-size:29px;
+      margin:8px 0;
+    }
+
+    .intro p,.hint {
+      color:#aeb2ca;
+      line-height:1.8;
+    }
+
+    .layout {
+      display:grid;
+      grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);
+      gap:24px;
+      align-items:start;
+    }
+
+    .panel {
+      background:#161b2d;
+      border:1px solid #30364c;
+      border-radius:18px;
+      padding:22px;
+    }
+
+    .preview {
+      position:sticky;
+      top:20px;
+    }
+
+    .bar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+    }
+
+    .bar h3 {
+      margin:0;
+      font-size:15px;
+    }
+
+    .live {
+      font-size:12px;
+      color:#8fe1c0;
+    }
+
+    canvas {
+      display:block;
+      width:100%;
+      border-radius:8px;
+      touch-action:none;
+      background:#080b18;
+    }
+
+    .actions {
+      display:flex;
+      gap:10px;
+      margin-top:20px;
+      flex-wrap:wrap;
+    }
+
+    button,.upload {
+      background:#2a3048;
+      color:white;
+      border:1px solid #414964;
+      border-radius:9px;
+      padding:10px 14px;
+      cursor:pointer;
+      font:inherit;
+    }
+
+    .primary {
+      background:#ad70f2;
+      border-color:#ad70f2;
+      color:#140b25;
+      font-weight:700;
+    }
+
+    button:hover,.upload:hover {
+      filter:brightness(1.13);
+    }
+
+    label {
+      display:block;
+      font-size:13px;
+      color:#c8cbdd;
+      margin:12px 0 6px;
+    }
+
+    input,textarea,select {
+      background:#0e1324;
+      border:1px solid #3a425d;
+      color:white;
+      border-radius:7px;
+      padding:9px;
+      font:inherit;
+      width:100%;
+    }
+
+    textarea {
+      resize:vertical;
+      min-height:62px;
+    }
+
+    input[type=color] {
+      padding:3px;
+      height:36px;
+    }
+
+    input[type=range] {
+      padding:0;
+    }
+
+    .row {
+      display:flex;
+      gap:8px;
+    }
+
+    .row>* {
+      flex:1;
+      min-width:0;
+    }
+
+    section+section {
+      border-top:1px solid #30364c;
+      margin-top:24px;
+      padding-top:12px;
+    }
+
+    h3 {
+      font-size:17px;
+    }
+
+    #layers button {
+      margin:4px 4px 0 0;
+      font-size:12px;
+    }
+
+    .active {
+      border-color:#cb91ff!important;
+      background:#493462!important;
+    }
+
+    .site-logo {
+      width: 180px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .songgrid {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+    }
+
+    .songgrid button {
+      padding:9px 0;
+    }
+
+    .help {
+      font-size:12px;
+      color:#aeb2ca;
+      line-height:1.8;
+    }
+
+    #status {
+      color:#96e5c0;
+      min-height:20px;
+      font-size:12px;
+    }
+
+    details {
+      margin-top:15px;
+    }
+
+    summary {
+      cursor:pointer;
+      color:#bdb7d5;
+    }
+
+    footer {
+      text-align:center;
+      color:#777f9d;
+      margin:24px;
+      font-size:12px;
+    }
+
+    @media(max-width:900px) {
+      .layout {
+        grid-template-columns:1fr;
+      }
+
+      .preview {
+        position:static;
+      }
+
+      header small {
+        display:none;
+      }
+
+      main {
+        padding:20px 4%;
+      }
+
+      .intro h2 {
+        font-size:24px;
+      }
+
+    }
+    </style>
+  </head>
+  <body>
+    <!-- サイトのヘッダー -->
+    <header>
+      <h1>
+        色カラ
+        <small>
+          / BINGO STUDIO
+        </small>
+      </h1>
+      <span class="badge">
+        楽曲ビンゴメーカー
+      </span>
+    </header>
+    <!-- メイン領域：紹介文・完成プレビュー・編集パネル -->
+    <main>
+    <!-- サイトのロゴ画像 -->
+    <img
+      src="メインポスター.jpg"
+      alt="色カラのロゴ"
+      class="site-logo"
+    >
+      <div class="layout">
+        <div class="panel preview">
+          <div class="bar">
+            <h3>
+              完成プレビュー
+            </h3>
+            <span class="live">
+              ● 入力をリアルタイム反映
+            </span>
+          </div>
+          <!-- 完成画像を描画するcanvas。app.jsで背景・追加画像・文字を重ねます。 -->
+          <canvas id="canvas" width="1758" height="987" aria-label="楽曲ビンゴ完成画像">
+          </canvas>
+          <p class="help">
+            追加した画像はプレビュー上でドラッグできます。曲のマスを押すと編集できます。
+          </p>
+          <div class="actions">
+            <!-- 完成画像をPNGファイルとして保存します。 -->
+            <button class="primary" id="download">
+              ↓ PNG画像を保存
+            </button>
+            <!-- 編集状態をJSONファイルに保存します。 -->
+            <button id="saveProject">
+              編集データを保存
+            </button>
+            <label class="upload" style="margin:0">
+              データを読込
+              <!-- 保存したJSONを読み込んで編集を再開します。 -->
+              <input type="file" id="loadProject" accept="application/json,.json" hidden>
+            </label>
+          </div>
+          <!-- 保存完了やエラーなどのメッセージを表示します。 -->
+          <p id="status" role="status">
+          </p>
+          <details>
+            <summary>
+              保存・使い方について
+            </summary>
+            <p class="help">
+              画像はこのブラウザー内で処理します。編集を再開する場合は「編集データを保存」で保存したJSONを読み込んでください。PNGは1758×987pxで出力します（元画像の解像度は586×329pxです）。スマートフォンでは保存後に画像を写真アプリへ保存できます。
+            </p>
+          </details>
+        </div>
+        <div class="panel">
+          <section>
+            <h3>
+              01 / 画像を飾る
+            </h3>
+            <label class="upload" style="display:inline-block;margin:0">
+              ＋ 画像を追加（複数可）
+              <!-- 画像選択欄。multipleで複数選択、acceptで画像形式を指定しています。 -->
+              <input id="files" type="file" accept="image/*" multiple hidden>
+            </label>
+            <p class="help">
+              左上の枠内に配置されます。背景透過PNGにも対応。
+            </p>
+            <!-- 追加画像を選択するボタンをJavaScriptで生成する場所です。 -->
+            <div id="layers">
+            </div>
+            <!-- 画像選択時に表示するサイズ・位置調整パネルです。 -->
+            <div id="imageControls" hidden>
+              <label>
+                大きさ
+                <input id="scale" type="range" min="10" max="220" value="70">
+              </label>
+              <div class="row">
+                <div>
+                  <label>
+                    横位置
+                    <input id="posX" type="range" min="-50" max="100">
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    縦位置
+                    <input id="posY" type="range" min="-50" max="100">
+                  </label>
+                </div>
+              </div>
+              <div class="actions">
+                <button id="front">
+                  最前面へ
+                </button>
+                <button id="remove">
+                  選択画像を削除
+                </button>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h3>
+              02 / 名前を入れる
+            </h3>
+            <label for="name">
+              表示名
+            </label>
+            <!-- 表示名の入力欄。idはJavaScriptとの接続に使います。 -->
+            <input id="name" placeholder="あなたの名前" maxlength="60">
+            <div class="row">
+              <div>
+                <label>
+                  文字色
+                  <!-- 名前の文字色を選択します。 -->
+                  <input id="nameColor" type="color" value="#d91d37">
+                </label>
+              </div>
+              <div>
+                <label>
+                  フォント
+                  <!-- 名前のフォント。選択肢はJavaScriptで生成します。 -->
+                  <select id="nameFont">
+                  </select>
+                </label>
+              </div>
+            </div>
+            <label>
+              文字サイズ
+              <!-- 名前の文字サイズを変更するスライダーです。 -->
+              <input id="nameSize" type="range" min="12" max="65" value="36">
+            </label>
+          </section>
+          <section>
+            <h3>
+              03 / 25曲を選ぶ
+            </h3>
+            <p class="help">
+              左上から右へ1〜5、次の行が6〜10です。絵文字・改行も入力できます。
+            </p>
+            <!-- 1〜25のマス選択ボタンをJavaScriptで生成します。 -->
+            <div class="songgrid" id="songs">
+            </div>
+            <label id="songLabel" for="songText">
+              1マス目の曲名
+            </label>
+            <!-- 選択したマスの曲名を編集します。改行・絵文字に対応します。 -->
+            <textarea id="songText" placeholder="例：🌙&#10;ハッピーシンセサイザ" maxlength="200">
+            </textarea>
+            <div class="row">
+              <div>
+                <label>
+                  文字色
+                  <!-- 選択したマスの文字色を変更します。 -->
+                  <input id="songColor" type="color" value="#d91d37">
+                </label>
+              </div>
+              <div>
+                <label>
+                  フォント
+                  <!-- 選択したマスのフォントを変更します。 -->
+                  <select id="songFont">
+                  </select>
+                </label>
+              </div>
+            </div>
+            <label>
+              文字サイズ（長い曲名は自動縮小）
+              <!-- 文字サイズを調整します。長い曲名は描画時に自動縮小します。 -->
+              <input id="songSize" type="range" min="8" max="32" value="18">
+            </label>
+            <div class="actions">
+              <!-- 現在の文字スタイルを全25マスに適用します。 -->
+              <button id="applyAll">
+                この文字スタイルを全25マスへ
+              </button>
+            </div>
+            <details>
+              <summary>
+                25曲をまとめて入力
+              </summary>
+              <p class="help">
+                1行に1曲ずつ入力すると、左上から順に反映します。
+              </p>
+              <!-- 1行に1曲ずつ、曲名をまとめて入力する欄です。 -->
+              <textarea id="bulk" rows="6" placeholder="1曲目&#10;2曲目&#10;3曲目…">
+              </textarea>
+              <button id="bulkApply">
+                まとめて反映
+              </button>
+            </details>
+            <details>
+              <summary>
+                追加フォント
+              </summary>
+              <p class="help">
+                使用権のあるフォントファイルを追加できます。編集データにはフォントファイルは含まれません。再編集時には再度追加してください。
+              </p>
+              <!-- フォントファイルを追加します。 -->
+              <input id="fontUpload" type="file" accept=".ttf,.otf,.woff,.woff2">
+            </details>
+          </section>
+        </div>
+      </div>
+    </main>
+    <!-- ページ末尾 -->
+    <footer>
+      色カラ BINGO STUDIO · あなただけのセットリストを。
+    </footer>
+    <!-- 画像配置・文字描画・保存などの処理を読み込みます。 -->
+    <script src="app.js">
+    </script>
+  </body>
+</html>
